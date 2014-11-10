@@ -1,0 +1,17 @@
+{
+  "name": "koch-morse",
+  "description": "A Koch method Morse/CW trainer",
+  "version": "0.1.0",
+  "homepage": "https://github.com/erasche/koch-morse",
+  "license": "GPLv3",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.4.7",
+    "angular-material": "~0.11.2",
+    "angular-animate": "~1.4.7",
+    "angular-aria": "~1.4.7",
+    "angular-route": "~1.4.7",
+    "angular-resource": "~1.4.7",
+    "angular-material-icons": "~0.6.0"
+  }
+}

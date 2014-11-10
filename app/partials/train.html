@@ -1,0 +1,120 @@
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>
+          <span class="md-title">Koch Morse Trainer</span>
+        </h2>
+      </div>
+    </md-toolbar>
+ <section layout="row" flex>
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+      <md-toolbar class="md-accent">
+        <h1 class="md-toolbar-tools">Settings</h1>
+      </md-toolbar>
+      <md-content layout-padding>
+        <div layout="column">
+            <div layout="row">
+                <h3>
+                Display Delay
+                </h3>
+            </div>
+            <div layout="row">
+                <md-slider
+                    flex
+                    ng-model="settings.display_delay"
+                    step="1"
+                    md-discrete
+                    min="0"
+                    max="10"
+                    aria-label="Display Delay">
+                </md-slider>
+            </div>
+            <div layout="row">
+                <p ng-if="settings.display_delay==0">
+                Setting display delay to a negative value hides the display
+                completely.
+                </p>
+            </div>
+            <div layout="row">
+                <h3>
+                Pitch
+                </h3>
+            </div>
+            <div layout="row" layout-align="center center">
+                <md-slider
+                    flex
+                    ng-model="settings.pitch"
+                    step="5"
+                    min="600"
+                    max="900"
+                    aria-label="Pitch">
+                </md-slider>
+                {{ settings.pitch }} Hz
+            </div>
+
+            <div layout="row">
+                <h3>
+                Actual Character Speed (WPM)
+                </h3>
+            </div>
+            <div layout="row">
+                <md-slider
+                    flex
+                    ng-model="settings.wpm_actual"
+                    step="5"
+                    md-discrete
+                    min="15"
+                    max="80"
+                    aria-label="Actual Character Speed (WPM)">
+                </md-slider>
+                {{ settings.wpm_actual }}
+            </div>
+
+            <div layout="row">
+                <h3>
+                Effective Code Speed (WPM)
+                </h3>
+            </div>
+            <div layout="row">
+                <md-slider
+                    flex
+                    ng-model="settings.wpm_effective"
+                    step="{{ settings.wpm_actual / 5 }}"
+                    md-discrete
+                    min="{{ settings.wpm_actual / 5 }}"
+                    max="{{ settings.wpm_actual }}"
+                    aria-label="Effective Character Speed (WPM)">
+                </md-slider>
+                {{ settings.wpm_effective }}
+            </div>
+
+        </div>
+      </md-content>
+    </md-sidenav>
+    <md-content flex layout-padding>
+      <div layout="column" layout-fill layout-align="top center">
+      <md-card flex>
+        <md-card-content>
+          <!-- The row for the city select autocomplete list -->
+          <md-content>
+            <h1>Level {{ level }}</h1>
+            <!-- slice to remove first space -->
+            <p>Letters: {{ level_alphabet.slice(1) | join: ", " }}</p>
+            <div>
+                <ng-md-icon style="height:64px; width:64px" ng-if="!running" ng-click="toggleState()" icon="play_arrow" size="64"></ng-md-icon>
+                <ng-md-icon style="height:64px; width:64px" ng-if="running" ng-click="toggleState()" icon="pause" size="64"></ng-md-icon>
+            </div>
+            <div><code style="font-size: 1.5em">Tape: {{ tapeActual.slice(-20, settings.display_delay > 1 ? -settings.display_delay : undefined) | join: "" }}</code>
+            </div>
+            <div>
+                <textarea style="width:95%;height: 10em"></textarea>
+            </div>
+
+
+          </md-content>
+        </md-card-content>
+        </md-card>
+      </div>
+      <div flex></div>
+    </md-content>
+  </section>
+
