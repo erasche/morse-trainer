@@ -4,9 +4,7 @@
 
 var morseApp = angular.module('morseApp', [
   'ngRoute',
-  'phonecatAnimations',
   'ngMdIcons',
-
   'ngMaterial',
   'morseControllers',
   'phonecatFilters'
