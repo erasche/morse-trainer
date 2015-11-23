@@ -4,7 +4,7 @@
 
 var morseControllers = angular.module('morseControllers', []);
 
-function MorseNode(ac, rate) {
+function MorseNode(ac, pitch, rate) {
     // ac is an audio context.
     this._oscillator = ac.createOscillator();
     this._gain = ac.createGain();
@@ -102,7 +102,7 @@ MorseNode.prototype.playString = function(t, w) {
 morseControllers.controller('TrainCtrl', ['$scope',
   function($scope){
     $scope.level = 0;
-    $scope.alphabet = ' kmrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x'.split('');
+    $scope.alphabet = '_kmrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x'.split('');
     $scope.gen = null;
 
 
@@ -118,10 +118,11 @@ morseControllers.controller('TrainCtrl', ['$scope',
     };
 
     // Morse connector.
-    var ac = new (window.AudioContext || window.webkitAudioContext)();
-    var morse = new MorseNode(ac);
-    morse._oscillator.frequency.value = $scope.pitch;
-    morse.connect(ac.destination);
+    $scope.ac = new (window.AudioContext || window.webkitAudioContext)();
+    console.log($scope.ac)
+    console.log($scope.settings.pitch)
+    $scope.morse = new MorseNode($scope.ac, $scope.settings.pitch);
+    $scope.morse.connect($scope.ac.destination);
 
     //
     $scope.tapeActual = []
@@ -145,7 +146,7 @@ morseControllers.controller('TrainCtrl', ['$scope',
         $scope.$apply(function(){
             $scope.tapeActual.push(letter)
             console.log($scope.tapeActual)
-            morse.playString(ac.currentTime, letter);
+            $scope.morse.playString($scope.ac.currentTime, letter);
         })
     }
 
@@ -156,6 +157,11 @@ morseControllers.controller('TrainCtrl', ['$scope',
             $scope.toggleState()
             $scope.toggleState()
         }
+    });
+
+    $scope.$watch('settings.pitch', function() {
+        // Update pitch
+        $scope.morse._oscillator.frequency.value = $scope.settings.pitch
     });
 
   }]);

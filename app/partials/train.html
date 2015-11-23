@@ -92,18 +92,18 @@
     </md-sidenav>
     <md-content flex layout-padding>
       <div layout="column" layout-fill layout-align="top center">
-      <md-card flex>
+      <md-card flex layout-fill>
         <md-card-content>
           <!-- The row for the city select autocomplete list -->
           <md-content>
             <h1>Level {{ level }}</h1>
             <!-- slice to remove first space -->
-            <p>Letters: {{ level_alphabet.slice(1) | join: ", " }}</p>
+            <p>Letters: {{ level_alphabet.slice(1) | join: ", "  }}</p>
             <div>
                 <ng-md-icon style="height:64px; width:64px" ng-if="!running" ng-click="toggleState()" icon="play_arrow" size="64"></ng-md-icon>
                 <ng-md-icon style="height:64px; width:64px" ng-if="running" ng-click="toggleState()" icon="pause" size="64"></ng-md-icon>
             </div>
-            <div><code style="font-size: 1.5em">Tape: {{ tapeActual.slice(-20, settings.display_delay > 1 ? -settings.display_delay : undefined) | join: "" }}</code>
+            <div><code style="font-size: 1.5em">Tape: {{ tapeActual.slice(-20, settings.display_delay > 1 ? -settings.display_delay : undefined)  | join: "" }}</code>
             </div>
             <div>
                 <textarea style="width:95%;height: 10em"></textarea>
