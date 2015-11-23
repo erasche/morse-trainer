@@ -7,8 +7,7 @@ var morseApp = angular.module('morseApp', [
   'ngMdIcons',
   'ngMaterial',
   'morseControllers',
-  'phonecatFilters'
-  //'phonecatServices'
+  'morseFilters'
 ]);
 
 
