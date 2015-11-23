@@ -16,9 +16,13 @@ function MorseNode(ac, pitch, rate) {
 
     if(rate == undefined)
         rate = 20;
-    this._dot = 1.2 / rate; // formula from Wikipedia.
+    this.setRate(rate)
 
     this._oscillator.start(0);
+}
+
+MorseNode.prototype.setRate = function(rate) {
+    this._dot = 1.2 / rate; // formula from Wikipedia.
 }
 
 MorseNode.prototype.connect = function(target) {
@@ -119,33 +123,51 @@ morseControllers.controller('TrainCtrl', ['$scope',
 
     // Morse connector.
     $scope.ac = new (window.AudioContext || window.webkitAudioContext)();
-    console.log($scope.ac)
-    console.log($scope.settings.pitch)
-    $scope.morse = new MorseNode($scope.ac, $scope.settings.pitch);
+    $scope.morse = new MorseNode($scope.ac, $scope.settings.pitch, 20);
     $scope.morse.connect($scope.ac.destination);
 
     //
     $scope.tapeActual = []
     $scope.running = false;
+    $scope.lastWasSpace = true;
 
     $scope.toggleState = function(){
         $scope.running = !$scope.running;
 
         if($scope.running){
-            // TODO: math
-            $scope.gen = setInterval($scope.logger, $scope.settings['wpm_actual'] * 10);
+            var rate = (1000 * 60) / (7 * $scope.settings.wpm_actual)
+            $scope.gen = setInterval($scope.logger, rate);
         }else{
             clearInterval($scope.gen)
         }
     }
 
+    $scope._genLetter = function(){
+        return $scope.level_alphabet[Math.floor(Math.random() * $scope.level_alphabet.length)];
+    }
+
     $scope.logger = function(){
-        var letter = $scope.level_alphabet[
-            Math.floor(Math.random() * $scope.level_alphabet.length)];
+        var letter = $scope._genLetter();
+        // Don't have duplicate spaces, and don't start with a space.
+        if($scope.lastWasSpace) {
+            var cont = true;
+            while(cont){
+                var l = $scope._genLetter();
+                // If we last had a space, don't allow another.
+                if(l != "_"){
+                    letter = l;
+                    $scope.lastWasSpace = false;
+                    cont = false;
+                }
+            }
+        }
+        if(letter == "_"){
+            $scope.lastWasSpace = true;
+        }
 
         $scope.$apply(function(){
             $scope.tapeActual.push(letter)
-            console.log($scope.tapeActual)
+            console.log('Last ten:' + $scope.tapeActual.slice(-10))
             $scope.morse.playString($scope.ac.currentTime, letter);
         })
     }
