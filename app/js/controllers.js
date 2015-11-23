@@ -105,10 +105,6 @@ morseControllers.controller('TrainCtrl', ['$scope',
     $scope.alphabet = ' kmrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x'.split('');
     $scope.gen = null;
 
-    // Morse connector.
-    var ac = new (window.AudioContext || window.webkitAudioContext)();
-    var morse = new MorseNode(ac);
-    morse.connect(ac.destination);
 
     $scope.settings = {
         'display_delay': 2,
@@ -121,6 +117,13 @@ morseControllers.controller('TrainCtrl', ['$scope',
       $scope.level_alphabet = $scope.alphabet.slice(0, $scope.level + 2);
     };
 
+    // Morse connector.
+    var ac = new (window.AudioContext || window.webkitAudioContext)();
+    var morse = new MorseNode(ac);
+    morse._oscillator.frequency.value = $scope.pitch;
+    morse.connect(ac.destination);
+
+    //
     $scope.tapeActual = []
     $scope.running = false;
 
