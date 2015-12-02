@@ -103,27 +103,40 @@ MorseNode.prototype.playString = function(t, w) {
     return t;
 }
 
-morseControllers.controller('TrainCtrl', ['$scope',
-  function($scope){
-    $scope.level = 0;
+morseControllers.controller('TrainCtrl', ['$scope', '$localStorage',
+  function($scope, $localStorage){
     $scope.alphabet = '_kmrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x'.split('');
     $scope.gen = null;
-
-
-    $scope.settings = {
+    $scope.$storage = $localStorage.$default({
         'display_delay': 2,
         'pitch': 700,
         'wpm_actual': 25,
-        'wpm_effective': 25,
-    }
+        'level_size': 150,
+        'level': 1,
+        'maxAchieved': 1,
+    });
+
     $scope.setLevel = function(level){
-      $scope.level = level
-      $scope.level_alphabet = $scope.alphabet.slice(0, $scope.level + 2);
+        // Store our new level
+        $scope.$storage.level = level
+        // If we've not been to this level yet, upgrade us.
+        if($scope.$storage.level > $scope.$storage.maxAchieved){
+            $scope.$storage.maxAchieved = $scope.$storage.level;
+        }
+        // Update the levle alphabet
+        $scope.level_alphabet = $scope.alphabet.slice(0, $scope.$storage.level + 2);
+        $scope.tapeActual = []
+        $scope.levelComplete = false;
+        // Reset the text area
+        $scope.text = "";
     };
+    $scope.levelComplete = false;
+    $scope.canAdvance = false;
+    $scope.text = "";
 
     // Morse connector.
     $scope.ac = new (window.AudioContext || window.webkitAudioContext)();
-    $scope.morse = new MorseNode($scope.ac, $scope.settings.pitch, 20);
+    $scope.morse = new MorseNode($scope.ac, $scope.$storage.pitch, 20);
     $scope.morse.connect($scope.ac.destination);
 
     //
@@ -131,11 +144,36 @@ morseControllers.controller('TrainCtrl', ['$scope',
     $scope.running = false;
     $scope.lastWasSpace = true;
 
+    $scope.advanceLevel = function(){
+        // If they can advance, or if they've backtracked to a previous level...
+        if($scope.canAdvance || $scope.$storage.level < $scope.$storage.maxAchieved){
+            // Then allow them to go to the next level
+            $scope.setLevel($scope.$storage.level + 1)
+
+            if($scope.$storage.level == $scope.$storage.maxAchieved){
+                $scope.canAdvance = false;
+            }
+        }
+    }
+
+    $scope.fallbackLevel = function(){
+        $scope.setLevel($scope.$storage.level - 1)
+    }
+
     $scope.toggleState = function(){
         $scope.running = !$scope.running;
 
+        if($scope.levelComplete){
+            console.log($scope.text)
+            var d = new Levenshtein($scope.tapeActual.join("").replace('_', ' '), $scope.text)
+            if(($scope.$storage.level_size - d / (0.0 + $scope.$storage.level_size)) > 0.90){
+                // Passed the level
+                $scope.canAdvance = true;
+            }
+        }
+
         if($scope.running){
-            var rate = (1000 * 60) / (7 * $scope.settings.wpm_actual)
+            var rate = (1000 * 90) / (7 * $scope.$storage.wpm_actual)
             $scope.gen = setInterval($scope.logger, rate);
         }else{
             clearInterval($scope.gen)
@@ -147,6 +185,13 @@ morseControllers.controller('TrainCtrl', ['$scope',
     }
 
     $scope.logger = function(){
+        if(($scope.tapeActual.length + 2) > $scope.$storage.level_size){
+            // Mark as complete
+            $scope.levelComplete = true;
+            // level complete, so stop it.
+            $scope.toggleState()
+        }
+
         var letter = $scope._genLetter();
         // Don't have duplicate spaces, and don't start with a space.
         if($scope.lastWasSpace) {
@@ -167,23 +212,22 @@ morseControllers.controller('TrainCtrl', ['$scope',
 
         $scope.$apply(function(){
             $scope.tapeActual.push(letter)
-            console.log('Last ten:' + $scope.tapeActual.slice(-10))
             $scope.morse.playString($scope.ac.currentTime, letter);
         })
     }
 
-    $scope.setLevel(1);
+    $scope.setLevel($scope.$storage.level);
 
-    $scope.$watch('settings.wpm_actual', function() {
+    $scope.$watch('$storage.wpm_actual', function() {
         if($scope.running){
             $scope.toggleState()
             $scope.toggleState()
         }
     });
 
-    $scope.$watch('settings.pitch', function() {
+    $scope.$watch('$storage.pitch', function() {
         // Update pitch
-        $scope.morse._oscillator.frequency.value = $scope.settings.pitch
+        $scope.morse._oscillator.frequency.value = $scope.$storage.pitch
     });
 
   }]);

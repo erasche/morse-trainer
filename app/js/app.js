@@ -6,6 +6,7 @@ var morseApp = angular.module('morseApp', [
   'ngRoute',
   'ngMdIcons',
   'ngMaterial',
+  'ngStorage',
   'morseControllers',
   'morseFilters'
 ]);

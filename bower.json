@@ -13,6 +13,7 @@
     "angular-route": "~1.4.7",
     "angular-resource": "~1.4.7",
     "angular-material-icons": "~0.6.0",
-    "levenshtein": "~1.0.5"
+    "levenshtein": "~1.0.5",
+    "ngstorage": "~0.3.10"
   }
 }
