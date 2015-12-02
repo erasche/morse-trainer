@@ -12,6 +12,7 @@
     "angular-aria": "~1.4.7",
     "angular-route": "~1.4.7",
     "angular-resource": "~1.4.7",
-    "angular-material-icons": "~0.6.0"
+    "angular-material-icons": "~0.6.0",
+    "levenshtein": "~1.0.5"
   }
 }
